@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-producer
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: order-producer
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/scheme: "http"
+        prometheus.io/path: "/"
+        prometheus.io/port: "8000"
+      labels:
+        app: order-producer
+    spec:
+      containers:
+      - name: producer
+        image: <acr_name>.azurecr.io/order-producer:v1
+        env:
+          - name: CONNECTION_STR
+            valueFrom:
+              secretKeyRef:
+                name: service-bus-connection
+                key: primary-connection-string
+                optional: false
+          - name: QUEUE_NAME
+            value: orders
+        resources:
+          requests:
+            cpu: 200m

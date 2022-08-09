@@ -1,0 +1,12 @@
+FROM python
+
+RUN apt-get update &&\
+    apt-get -y install cmake &&\
+    pip install azure-servicebus &&\
+    pip install prometheus_client
+
+WORKDIR /app
+
+COPY order-consumer.py order-producer.py /app/
+
+CMD exec python -u order-producer.py
