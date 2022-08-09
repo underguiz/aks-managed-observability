@@ -2,7 +2,7 @@
 
 As we move to microservices based architectures, having a comprehensive observability solution is key to have highly available and reliable applications. But unfortunately self-managed observability solutions such as prometheus and grafana are difficult to operate, specially when you need longer retention times.
 
-This repository shows how to leverage **Azure Monitor Container Insights** with **Prometheus Integration** together with **Azure Managed Grafana (Preview)** as a complete managed observability solution, removing the operational costs and hassle that comes from maintaining a self-managed solution.
+This repository shows how to leverage **Azure Monitor Container Insights** with **Prometheus Integration** together with **Azure Managed Grafana (Preview)** as a complete managed observability solution for workloads running on AKS, removing the operational costs and hassle that comes from maintaining a self-managed solution.
 
 ### Create the infrastructure using terraform
 
