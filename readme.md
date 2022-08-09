@@ -12,6 +12,7 @@ $ az login
 $ terraform init
 $ terraform plan -var 'aks-observability-rg=<resource_group_name>'
 $ terraform apply -var 'aks-observability-rg=<resource_group_name>'
+$ az aks get-credentials --name aks-observability --resource-group <resource_group_name>
 ```
 
 ### Enable Prometheus metrics collection 
@@ -59,12 +60,26 @@ This dashboard shows metrics collected from Container Insights and fetched using
 ### Check the application logs
 
 ```
-$ az monitor log-analytics query -w $LOG_ANALYTICS_WORKSPACE_ID --analytics-query "ContainerLog | where TimeGenerated > ago(10m)"
+$ LOG_QUERY="KubePodInventory | 
+extend PodLabel = todynamic(PodLabel)
+| where PodLabel[0].app == 'order-consumer'
+| project ContainerID
+| join kind=rightsemi (    
+ ContainerLog 
+ | project TimeGenerated, ContainerID, LogEntry
+ | where TimeGenerated > ago(10m)
+)
+on ContainerID"
+$ WORKSPACE_GUID=$(az monitor log-analytics workspace show -n aks-observability -g <resource_group> --query customerId -o tsv) 
+$ az monitor log-analytics query -w $WORKSPACE_GUID --analytics-query "$LOG_QUERY" -o tsv
 ```
 
 Reference:
 
 https://azure.microsoft.com/en-us/services/managed-grafana/
+
 https://grafana.com/docs/grafana/latest/datasources/azuremonitor/
+
 https://docs.microsoft.com/en-us/azure/azure-monitor/containers/container-insights-overview
+
 https://docs.microsoft.com/en-us/azure/azure-monitor/containers/container-insights-prometheus-integration
